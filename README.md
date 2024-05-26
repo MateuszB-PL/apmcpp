@@ -1,6 +1,6 @@
 # Compiling
-1. install gcc and libarchive-devel
-2. compile with: `gcc main.cpp -o apm -larchive`
+ -  install gcc and libarchive-devel
+ -  compile with: `gcc main.cpp -o apm -larchive`
 
 # Usage
 
