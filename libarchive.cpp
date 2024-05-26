@@ -1,7 +1,7 @@
 #include <iostream>
 #include <archive.h>
 #include <archive_entry.h>
-//larchive
+//libarchive-devel
 static int
 copy_data(struct archive *ar, struct archive *aw)
 {

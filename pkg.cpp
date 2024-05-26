@@ -47,16 +47,6 @@ void forexec(const std::string &jsonarray)
 }
 void install()
 {
-    //vars
-    jvars.pminstallcmd = jvars.j["pminstallcmd"];
-    jvars.pkgarchivetype = jvars.j["pkgarchivetype"];
-    jvars.pmupdatecmd = jvars.j["pmupdatecmd"];
-    jvars.appname = jvars.j["appname"];
-    vars.root = "/usr/apps/" + jvars.appname + "/root";
-    vars.desktop = "/usr/apps/" + jvars.appname + "/desktop";
-    vars.applicationdesktop = "/usr/share/applications";
-    //srav
-
     std::cout << "Apps that will be installed: " << jvars.appname << std::endl
               << std::endl;
     std::cout << "Dependencies that will be installed: ";
@@ -96,23 +86,25 @@ void install()
 
         try
         {
-            if (fs::exists(vars.root) || fs::is_directory(vars.root))
+            std::string root = "/usr/apps/" + jvars.appname + "/root";
+            std::string desktop = "/usr/apps/" + jvars.appname + "/desktop";
+            if (fs::exists(root) || fs::is_directory(root))
             {
-                for (const auto &entry : fs::recursive_directory_iterator(vars.root))
+                for (const auto &entry : fs::recursive_directory_iterator(root))
                 {
                     fs::path target = entry.path();
-                    fs::path link = vars.link_base / fs::relative(target, vars.root);
+                    fs::path link = vars.link_base / fs::relative(target, root);
                     create_recursive_symlink(target, link);
                 }
                 std::cout << vars.prefix << "System root files linked to /.\n"
                           << std::endl;
             }
-            if (fs::exists(vars.desktop) || fs::is_directory(vars.desktop))
+            if (fs::exists(desktop) || fs::is_directory(desktop))
             {
-                for (const auto &entry : fs::recursive_directory_iterator(vars.desktop))
+                for (const auto &entry : fs::recursive_directory_iterator(desktop))
                 {
                     fs::path target = entry.path();
-                    fs::path link = vars.applicationdesktop / fs::relative(target, vars.desktop);
+                    fs::path link = vars.applicationdesktop / fs::relative(target, desktop);
                     create_recursive_symlink(target, link);
                 }
                 std::cout << vars.prefix << "Desktop files linked to:" << vars.applicationdesktop
@@ -130,10 +122,10 @@ void install()
 }
 void uninstall(std::string appname)
 {
-    vars.apppath = "/usr/apps/" + appname;
-    if (fs::exists(vars.apppath) || fs::is_directory(vars.apppath))
+    std::string apppath = "/usr/apps/" + appname;
+    if (fs::exists(apppath) || fs::is_directory(apppath))
     {
-        fs::remove_all(vars.apppath);
+        fs::remove_all(apppath);
         std::cout << vars.prefix << "App removed from local APM repo: " << appname << std::endl;
     }
     else

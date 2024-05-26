@@ -13,19 +13,16 @@ namespace pkg
     {
     public:
         json j = json::parse(f);
-        std::string appname;
-        std::string pminstallcmd;
-        std::string pkgarchivetype;
-        std::string pmupdatecmd;
+        std::string appname = j["appname"];
+        std::string pminstallcmd = j["pminstallcmd"];
+        std::string pkgarchivetype = j["pkgarchivetype"];
+        std::string pmupdatecmd = j["pmupdatecmd"];
     };
     class vars
     {
     public:
         std::string link_base = "/";
-        std::string root;
-        std::string desktop;
-        std::string applicationdesktop;
-        std::string apppath;
+        std::string applicationdesktop = "/usr/share/applications";
         std::string const prefix = "[APM] ";
     };
     class mgr{
