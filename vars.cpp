@@ -6,7 +6,7 @@
 namespace fs = std::filesystem;
 
 using json = nlohmann::json;
-
+//vars
 class vars{
     private:
         std::ifstream f;

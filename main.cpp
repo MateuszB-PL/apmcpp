@@ -5,8 +5,7 @@
 #include "pkg.cpp"
 
 
-
-
+//main
 
 int main(int argc, char *argv[]) {
     if (getuid() != 0){ std::cout<< "Please run as root"; exit(1);}
