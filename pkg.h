@@ -21,7 +21,7 @@ namespace pkg
     class vars
     {
     public:
-        std::string link_base;
+        std::string link_base = "/";
         std::string root;
         std::string desktop;
         std::string applicationdesktop;
