@@ -14,7 +14,7 @@ int main(int argc, char *argv[]) {
         switch(getopt(argc, argv, "iu:s:h")) // note the colon (:) to indicate that 'b' has a parameter and is not a switch
         {
         case 'i':
-            std::cout << v.prefix <<"Installing from APPCONF"<<std::endl;
+            std::cout <<"Installing from APPCONF"<<std::endl;
             install();
             continue;
 

@@ -1,106 +1,143 @@
+// pkg.cpp
 #include <iostream>
 #include <filesystem>
 #include "libarchive.cpp"
-#include "vars.cpp"
+#include "pkg.h"
 namespace fs = std::filesystem;
-vars v;
-//pkg
-void create_recursive_symlink(const fs::path& target, const fs::path& link) {
-    if (fs::is_directory(target)) {
+
+
+
+pkg::jvars jvars;
+pkg::vars vars;
+pkg::mgr mgr;
+std::string link_base = "/";
+
+
+// pkg
+void create_recursive_symlink(const fs::path &target, const fs::path &link)
+{
+    if (fs::is_directory(target))
+    {
         fs::create_directory_symlink(target, link);
-        for (const auto& entry : fs::directory_iterator(target)) {
+        for (const auto &entry : fs::directory_iterator(target))
+        {
             create_recursive_symlink(entry.path(), link / entry.path().filename());
         }
-    } else if (fs::is_regular_file(target)) {
+    }
+    else if (fs::is_regular_file(target))
+    {
         fs::create_symlink(target, link);
     }
 }
 
-
-void sync(const std::string& jsonarray){
-    for (std::string value : v.j[jsonarray]) {
-        std::string cmd = v.pminstallcmd + " " + std::string(value);
+void sync(const std::string &jsonarray)
+{
+    jvars.pminstallcmd = jvars.j["pminstallcmd"];
+    for (std::string value : jvars.j[jsonarray])
+    {
+        std::string cmd = jvars.pminstallcmd + " " + std::string(value);
         std::cout << cmd.c_str() << std::endl;
         system(cmd.c_str());
     }
 }
-void forexec(const std::string& jsonarray){
-    for (std::string value : v.j[jsonarray]) {
+void forexec(const std::string &jsonarray)
+{
+    for (std::string value : jvars.j[jsonarray])
+    {
         system(value.c_str());
     }
 }
 void install()
 {
-    
-    std::cout<< "Apps that will be installed: " << v.appname << std::endl <<std::endl;
-    std::cout<< "Dependencies that will be installed: ";
-    for (std::string value : v.j["deps"]) {
-            std::string cmd = std::string(value) + " ";
-            std::cout << cmd.c_str();
+    jvars.pkgarchivetype = jvars.j["pkgarchivetype"];
+    jvars.pmupdatecmd = jvars.j["pmupdatecmd"];
+    jvars.appname = jvars.j["appname"];
+    vars.root = "/usr/apps/" + jvars.appname + "/root";
+    vars.desktop = "/usr/apps/" + jvars.appname + "/desktop";
+    vars.applicationdesktop = "/usr/share/applications";
+    std::cout << "Apps that will be installed: " << jvars.appname << std::endl
+              << std::endl;
+    std::cout << "Dependencies that will be installed: ";
+    for (std::string value : jvars.j["deps"])
+    {
+        std::string cmd = std::string(value) + " ";
+        std::cout << cmd.c_str();
     }
     // std::cout<< "Commands that will be executed: ";
     // for (std::string value : j["cmds"]) {
     //     std::string cmd = std::string(value) + " ";
     //     std::cout << cmd.c_str();
     // }
-    std::cout << std::endl << std::endl;
-    std::cout<< "Continue? [y/N]: ";
+    std::cout << std::endl
+              << std::endl;
+    std::cout << "Continue? [y/N]: ";
 
     char userinput = std::cin.get();
-    if (tolower(userinput) == 'y'){
-        std::cout << v.prefix << "Executing preparation cmds... "<< std::endl;
+    if (tolower(userinput) == 'y')
+    {
+        std::cout << vars.prefix << "Executing preparation cmds... " << std::endl;
         forexec("prepcmds");
-        std::cout << v.prefix << "Updating repositories..." << std::endl;
-        system(v.pmupdatecmd.c_str());
-        std::cout << v.prefix << "Repositories update done" << std::endl;
-        std::cout << v.prefix << "Installing dependencies..." << std::endl;
+        std::cout << vars.prefix << "Updating repositories..." << std::endl;
+        system(jvars.pmupdatecmd.c_str());
+        std::cout << vars.prefix << "Repositories update done" << std::endl;
+        std::cout << vars.prefix << "Installing dependencies..." << std::endl;
         sync("deps");
-        std::cout << v.prefix << "Installing dependencies done" << std::endl;
-        std::cout << v.prefix << "Please wait, extracting in progress, this might take a while..." << std::endl;
-        std::string extractstr = v.appname + "." + std::string(v.pkgarchivetype);
+        std::cout << vars.prefix << "Installing dependencies done" << std::endl;
+        std::cout << vars.prefix << "Please wait, extracting in progress, this might take a while..." << std::endl;
+        std::string extractstr = jvars.appname + "." + std::string(jvars.pkgarchivetype);
         extract(extractstr.c_str());
-        const auto copyOptions = std::filesystem::copy_options::update_existing
-                           | std::filesystem::copy_options::recursive
-                           ;
+        const auto copyOptions = std::filesystem::copy_options::update_existing | std::filesystem::copy_options::recursive;
 
-        std::filesystem::copy(v.appname, "/usr/apps/" + v.appname, copyOptions);
-        std::filesystem::remove_all(v.appname);
-        std::cout << v.prefix << "Extracting and Copying done" << std::endl;
-        
+        std::filesystem::copy(jvars.appname, "/usr/apps/" + jvars.appname, copyOptions);
+        std::filesystem::remove_all(jvars.appname);
+        std::cout << vars.prefix << "Extracting and Copying done" << std::endl;
+
         try
         {
-            if (fs::exists(v.root) || fs::is_directory(v.root)) {
-                for (const auto& entry : fs::recursive_directory_iterator(v.root)) {
+            std::cout << vars.root;
+            if (fs::exists(vars.root) || fs::is_directory(vars.root))
+            {
+                for (const auto &entry : fs::recursive_directory_iterator(vars.root))
+                {
                     fs::path target = entry.path();
-                    fs::path link = v.link_base / fs::relative(target, v.root);
+                    fs::path link = link_base / fs::relative(target, vars.root);
                     create_recursive_symlink(target, link);
                 }
-                std::cout << v.prefix << "System root files linked to /.\n" << std::endl;
+                std::cout << vars.prefix << "System root files linked to /.\n"
+                          << std::endl;
             }
-            if (fs::exists(v.desktop) || fs::is_directory(v.desktop)) {
-                for (const auto& entry : fs::recursive_directory_iterator(v.desktop)) {
+            std::cout << vars.desktop;
+            if (fs::exists(vars.desktop) || fs::is_directory(vars.desktop))
+            {
+                for (const auto &entry : fs::recursive_directory_iterator(vars.desktop))
+                {
                     fs::path target = entry.path();
-                    fs::path link = v.applicationdesktop / fs::relative(target, v.desktop);
+                    fs::path link = vars.applicationdesktop / fs::relative(target, vars.desktop);
                     create_recursive_symlink(target, link);
                 }
-                std::cout << v.prefix << "Desktop files linked to /usr/share/applications.\n" << std::endl;
+                std::cout << vars.prefix << "Desktop files linked to /usr/share/applications.\n"
+                          << std::endl;
             }
         }
         catch (std::exception e)
         {
-            std::cout << v.prefix << "Already linked, (skipping)"<<std::endl;
+            std::cout << vars.prefix << "Already linked, (skipping)" << std::endl;
         }
         forexec("cmds");
 
-        std::cout << v.prefix <<"Installation Complete!"<<std::endl;
+        std::cout << vars.prefix << "Installation Complete!" << std::endl;
     }
 }
-void uninstall(std::string appname){
-    std::string apppath = "/usr/apps/" + appname;
-    if (fs::exists(apppath) || fs::is_directory(apppath)) {
-        fs::remove_all(apppath);
-        std::cout << v.prefix << "App removed from local APM repo: " << appname << std::endl;
-    } else {
-        std::cout << v.prefix << "App package couldn't be found in local APM repo: " << appname <<std::endl;
+void uninstall(std::string appname)
+{
+    vars.apppath = "/usr/apps/" + appname;
+    if (fs::exists(vars.apppath) || fs::is_directory(vars.apppath))
+    {
+        fs::remove_all(vars.apppath);
+        std::cout << vars.prefix << "App removed from local APM repo: " << appname << std::endl;
+    }
+    else
+    {
+        std::cout << vars.prefix << "App package couldn't be found in local APM repo: " << appname << std::endl;
     }
 }
