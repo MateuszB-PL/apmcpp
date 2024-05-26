@@ -1,5 +1,5 @@
 # Compiling
- -  install gcc and libarchive-devel
+ -  install gcc, libarchive-devel and nlohmann json (json-devel)
  -  compile with: `gcc main.cpp -o apm -larchive`
 
 # Usage
