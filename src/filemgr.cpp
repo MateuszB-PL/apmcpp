@@ -33,7 +33,8 @@ void gen_example_appconf()
     outfile.close();
 }
 
-void display_installed_packages(){
-    for (const auto & entry : fs::directory_iterator(paths.local_repo_directory))
+void display_installed_packages()
+{
+    for (const auto &entry : fs::directory_iterator(paths.local_repo_directory))
         std::cout << entry.path() << std::endl;
 }

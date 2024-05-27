@@ -1,7 +1,7 @@
 #include <archive.h>
 #include <archive_entry.h>
 #include <stdlib.h>
-//libarchive-devel
+// libarchive-devel
 static int
 copy_data(struct archive *ar, struct archive *aw)
 {
@@ -10,14 +10,16 @@ copy_data(struct archive *ar, struct archive *aw)
     size_t size;
     la_int64_t offset;
 
-    for (;;) {
+    for (;;)
+    {
         r = archive_read_data_block(ar, &buff, &size, &offset);
         if (r == ARCHIVE_EOF)
             return (ARCHIVE_OK);
         if (r < ARCHIVE_OK)
             return (r);
         r = archive_write_data_block(aw, buff, size, offset);
-        if (r < ARCHIVE_OK) {
+        if (r < ARCHIVE_OK)
+        {
             fprintf(stderr, "%s\n", archive_error_string(aw));
             return (r);
         }
@@ -46,7 +48,8 @@ extract(const char *filename)
     archive_write_disk_set_standard_lookup(ext);
     if ((r = archive_read_open_filename(a, filename, 10240)))
         exit(1);
-    for (;;) {
+    for (;;)
+    {
         r = archive_read_next_header(a, &entry);
         if (r == ARCHIVE_EOF)
             break;
@@ -57,7 +60,8 @@ extract(const char *filename)
         r = archive_write_header(ext, entry);
         if (r < ARCHIVE_OK)
             fprintf(stderr, "%s\n", archive_error_string(ext));
-        else if (archive_entry_size(entry) > 0) {
+        else if (archive_entry_size(entry) > 0)
+        {
             r = copy_data(a, ext);
             if (r < ARCHIVE_OK)
                 fprintf(stderr, "%s\n", archive_error_string(ext));

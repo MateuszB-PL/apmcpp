@@ -2,7 +2,6 @@
 #include <iostream>
 #include <filesystem>
 
-
 namespace file
 {
     class paths

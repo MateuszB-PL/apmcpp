@@ -5,12 +5,9 @@
 #include "pkg.h"
 namespace fs = std::filesystem;
 
-
-
 pkg::jvars jvars;
 pkg::vars vars;
 pkg::mgr mgr;
-
 
 // pkg
 void create_recursive_symlink(const fs::path &target, const fs::path &link)

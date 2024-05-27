@@ -17,6 +17,7 @@ namespace pkg
         std::string pminstallcmd = j["pminstallcmd"];
         std::string pkgarchivetype = j["pkgarchivetype"];
         std::string pmupdatecmd = j["pmupdatecmd"];
+        std::string appsrc = j["appsrc"];
     };
     class vars
     {
@@ -25,7 +26,8 @@ namespace pkg
         std::string const applicationdesktop = "/usr/share/applications";
         std::string const prefix = "[APM] ";
     };
-    class mgr{
+    class mgr
+    {
         void install();
         void uninstall();
     };
