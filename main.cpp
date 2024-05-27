@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <string>
 #include "pkg.cpp"
-#include "mkfile.cpp"
+#include "filemgr.cpp"
 //main
 
 class programInfo {
@@ -21,30 +21,36 @@ class programInfo {
             return cppver;
         }
 };
-
+void checkroot(){
+        if (getuid() != 0){ std::cout<< vars.prefix << "Please run as root"; exit(1);}
+    }
 int main(int argc, char *argv[]) {
     programInfo programInfo;
-    if (getuid() != 0){ std::cout<< vars.prefix << "Please run as root"; exit(1);}
     for(;;)
     {
-        switch(getopt(argc, argv, "iu:s:hev")) // note the colon (:) to indicate that 'n' has a parameter and is not a switch
+        switch(getopt(argc, argv, "iu:s:hevl")) // note the colon (:) to indicate that 'n' has a parameter and is not a switch
         {
         case 'i':
+            checkroot();
             std::cout << vars.prefix <<"Installing from APPCONF"<<std::endl;
             install();
-            continue;
+            break;
 
         case 'u':
+            checkroot();
             uninstall(optarg);
-            continue;
+            break;
         case 's':
-            continue;
+            break;
         case 'e':
             gen_example_appconf();
-            continue;
+            break;
         case 'v':
-            std::cout<< "C++ build version: "<< __cplusplus << " or "<< programInfo.chkCppVer() <<" | APM - App Package Manager version: "<< programInfo.version <<std::endl;
-            continue;
+            std::cout<< "C++ build version: "<< __cplusplus << " or "<< programInfo.chkCppVer() <<"\n APM - App Package Manager version: "<< programInfo.version <<std::endl;
+            break;
+        case 'l':
+            display_installed_packages();
+            break;
         case '?':
         case 'h':
         default :

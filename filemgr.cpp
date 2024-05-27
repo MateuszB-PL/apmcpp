@@ -1,5 +1,9 @@
 #include <iostream>
 #include <fstream>
+#include <filesystem>
+#include "file.h"
+file::paths paths;
+namespace fs = std::filesystem;
 
 void gen_example_appconf()
 {
@@ -27,4 +31,9 @@ void gen_example_appconf()
 )" << std::endl;
 
     outfile.close();
+}
+
+void display_installed_packages(){
+    for (const auto & entry : fs::directory_iterator(paths.local_repo_directory))
+        std::cout << entry.path() << std::endl;
 }

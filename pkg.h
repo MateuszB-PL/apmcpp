@@ -21,8 +21,8 @@ namespace pkg
     class vars
     {
     public:
-        std::string link_base = "/";
-        std::string applicationdesktop = "/usr/share/applications";
+        std::string const link_base = "/";
+        std::string const applicationdesktop = "/usr/share/applications";
         std::string const prefix = "[APM] ";
     };
     class mgr{
