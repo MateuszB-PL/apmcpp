@@ -6,3 +6,5 @@
 
  - `sudo apm -i` install from APPCONF 
  - `sudo apm -u <package name>` uninstall package
+ - `apm -e` generate example appconf
+ - `apm -l` list all installed apps
