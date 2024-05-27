@@ -1,5 +1,6 @@
 #include <archive.h>
 #include <archive_entry.h>
+#include <stdlib.h>
 //libarchive-devel
 static int
 copy_data(struct archive *ar, struct archive *aw)
