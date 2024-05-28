@@ -12,12 +12,12 @@ namespace pkg
     class jvars
     {
     public:
-        json j = json::parse(f);
-        std::string appname = j["appname"];
-        std::string pminstallcmd = j["pminstallcmd"];
-        std::string pkgarchivetype = j["pkgarchivetype"];
-        std::string pmupdatecmd = j["pmupdatecmd"];
-        std::string appsrc = j["appsrc"];
+        json j;
+        std::string appname;
+        std::string pminstallcmd;
+        std::string pkgarchivetype;
+        std::string pmupdatecmd;
+        std::string appsrc;
     };
     class vars
     {

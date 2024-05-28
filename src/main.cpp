@@ -45,13 +45,7 @@ int main(int argc, char *argv[])
     {
         switch (getopt(argc, argv, "iu:s:hevl")) // note the colon (:) to indicate that 'n' has a parameter and is not a switch
         {
-        case 'install':
-        case 'i':
-            if (jvars.appsrc != "local")
-            {
-                std::cout << vars.prefix << "App source is not local, sync and install package using apm -s";
-                exit(1);
-            }
+        case 'i':     
             checkroot();
             std::cout << vars.prefix << "Installing from APPCONF" << std::endl;
             install();
@@ -62,11 +56,6 @@ int main(int argc, char *argv[])
             uninstall(optarg);
             break;
         case 's':
-            if (jvars.appsrc == "local")
-            {
-                std::cout << vars.prefix << "App source is local, install package using apm -i";
-                exit(1);
-            }
             break;
         case 'e':
             gen_example_appconf();

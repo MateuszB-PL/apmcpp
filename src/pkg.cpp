@@ -44,6 +44,17 @@ void forexec(const std::string &jsonarray)
 }
 void install()
 {
+    jvars.j = json::parse(f);
+    jvars.appname = jvars.j["appname"];
+    jvars.pminstallcmd = jvars.j["pminstallcmd"];
+    jvars.pkgarchivetype = jvars.j["pkgarchivetype"];
+    jvars.pmupdatecmd = jvars.j["pmupdatecmd"];
+    jvars.appsrc = jvars.j["appsrc"];
+    if (jvars.appsrc != "local")
+            {
+                std::cout << vars.prefix << "App source is not local, sync and install package using apm -s";
+                exit(1);
+            }
     std::cout << "Apps that will be installed: " << jvars.appname << std::endl
               << std::endl;
     std::cout << "Dependencies that will be installed: ";
