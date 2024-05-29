@@ -14,8 +14,8 @@ void gen_example_appconf()
     "appversion": "1.0.0",
     "appsrc": "local",
     "pkgarchivetype": "tar.gz",
-    "pmupdatecmd": "ex. apt update -y",
-    "pminstallcmd": "ex. apt install -y",
+    "pmupdatecmd": "apt update -y",
+    "pminstallcmd": "apt install -y",
     "deps": [
         "nano",
         "mc"

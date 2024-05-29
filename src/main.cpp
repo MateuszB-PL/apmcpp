@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     programInfo programInfo;
     for (;;)
     {
-        switch (getopt(argc, argv, "iu:s:hevl")) // note the colon (:) to indicate that 'n' has a parameter and is not a switch
+        switch (getopt(argc, argv, "iu:shevl")) // note the colon (:) to indicate that 'n' has a parameter and is not a switch
         {
         case 'i':     
             checkroot();

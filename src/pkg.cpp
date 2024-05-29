@@ -7,7 +7,6 @@ namespace fs = std::filesystem;
 
 pkg::jvars jvars;
 pkg::vars vars;
-pkg::mgr mgr;
 
 // pkg
 void create_recursive_symlink(const fs::path &target, const fs::path &link)
@@ -50,11 +49,7 @@ void install()
     jvars.pkgarchivetype = jvars.j["pkgarchivetype"];
     jvars.pmupdatecmd = jvars.j["pmupdatecmd"];
     jvars.appsrc = jvars.j["appsrc"];
-    if (jvars.appsrc != "local")
-            {
-                std::cout << vars.prefix << "App source is not local, sync and install package using apm -s";
-                exit(1);
-            }
+    
     std::cout << "Apps that will be installed: " << jvars.appname << std::endl
               << std::endl;
     std::cout << "Dependencies that will be installed: ";
