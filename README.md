@@ -1,5 +1,5 @@
 # Compiling
- -  install clang (gcc), libarchive-devel and nlohmann json (json-devel)
+ -  install clang (g++), libarchive-devel and nlohmann json (json-devel)
  -  compile with: `g++ main.cpp -o apm -larchive`
 
 # Usage
