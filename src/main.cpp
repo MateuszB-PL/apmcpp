@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
             gen_example_appconf();
             break;
         case 'v':
-            std::cout << "C++ build version: " << __cplusplus << " or " << programInfo.chkCppVer() << "\n APM - App Package Manager version: " << programInfo.version << std::endl;
+            std::cout << "C++ build version: " << __cplusplus << " or " << programInfo.chkCppVer() << "\n APM - App Package Manager version: " << programInfo.version <<std::endl;
             break;
         case 'l':
             display_installed_packages();
