@@ -60,10 +60,10 @@ int main(int argc, char *argv[])
     programInfo programInfo;
     for (;;)
     {
-        switch (getopt(argc, argv, "iu:shevl")) // note the colon (:) to indicate that 'n' has a parameter and is not a switch
+        switch (getopt(argc, argv, "iu:shevlI")) // note the colon (:) to indicate that 'n' has a parameter and is not a switch
         {
         case 'i':
-            checkroot();
+            checkroot(); 
             std::cout << vars.prefix << "Installing from APPCONF" << std::endl;
             install();
             break;
@@ -82,6 +82,12 @@ int main(int argc, char *argv[])
             break;
         case 'l':
             display_installed_packages();
+            break;
+        case 'I':
+            checkroot();
+            fs::rename(argv[0], "apm");
+            fs::copy("apm", "/usr/bin");
+            fs::create_directories(paths.local_repo_directory);
             break;
         case '?':
         case 'h':
