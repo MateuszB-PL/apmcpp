@@ -2,8 +2,25 @@
 #include <fstream>
 #include <unistd.h>
 #include <string>
-#include "pkg.cpp"
+#include <archive.h>
+#include <archive_entry.h>
+#include <stdlib.h>
+#include <filesystem>
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+namespace fs = std::filesystem;
+
+#include "file.h"
+#include "pkg.h"
+
+pkg::jvars jvars;
+pkg::vars vars;
+file::paths paths;
+
+#include "libarchive.cpp"
 #include "filemgr.cpp"
+#include "pkg.cpp"
 // main
 
 class programInfo
@@ -45,7 +62,7 @@ int main(int argc, char *argv[])
     {
         switch (getopt(argc, argv, "iu:shevl")) // note the colon (:) to indicate that 'n' has a parameter and is not a switch
         {
-        case 'i':     
+        case 'i':
             checkroot();
             std::cout << vars.prefix << "Installing from APPCONF" << std::endl;
             install();
@@ -69,7 +86,13 @@ int main(int argc, char *argv[])
         case '?':
         case 'h':
         default:
-            printf("Help N/A\n");
+            std::cout << R"( 
+    sudo apm -i - install from APPCONF
+    sudo apm -u <package name> - uninstall package
+    apm -e - generate example appconf
+    apm -l - list all installed apps
+    apm -v - displays c++ compilation version and APM version
+ )";
             break;
 
         case -1:

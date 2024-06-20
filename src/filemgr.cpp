@@ -1,10 +1,3 @@
-#include <iostream>
-#include <fstream>
-#include <filesystem>
-#include "file.h"
-file::paths paths;
-namespace fs = std::filesystem;
-
 void gen_example_appconf()
 {
     std::ofstream outfile("rename_to_APPCONF");

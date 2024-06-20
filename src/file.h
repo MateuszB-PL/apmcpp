@@ -1,6 +1,4 @@
 // pkg.h
-#include <iostream>
-#include <filesystem>
 
 namespace file
 {

@@ -1,12 +1,4 @@
 // pkg.cpp
-#include <iostream>
-#include <filesystem>
-#include "libarchive.cpp"
-#include "pkg.h"
-namespace fs = std::filesystem;
-
-pkg::jvars jvars;
-pkg::vars vars;
 
 // pkg
 void create_recursive_symlink(const fs::path &target, const fs::path &link)
@@ -49,7 +41,7 @@ void install()
     jvars.pkgarchivetype = jvars.j["pkgarchivetype"];
     jvars.pmupdatecmd = jvars.j["pmupdatecmd"];
     jvars.appsrc = jvars.j["appsrc"];
-    
+
     std::cout << "Apps that will be installed: " << jvars.appname << std::endl
               << std::endl;
     std::cout << "Dependencies that will be installed: ";

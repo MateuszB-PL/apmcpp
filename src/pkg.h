@@ -1,10 +1,4 @@
 // pkg.h
-#include <iostream>
-#include <nlohmann/json.hpp>
-#include <fstream>
-#include <string>
-#include <filesystem>
-using json = nlohmann::json;
 std::ifstream f("APPCONF");
 
 namespace pkg
