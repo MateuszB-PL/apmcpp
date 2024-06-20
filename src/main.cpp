@@ -26,7 +26,7 @@ file::paths paths;
 class programInfo
 {
 public:
-    std::string version = "1.0.0";
+    std::string version = "alpha0.2";
     std::string cppver;
     std::string chkCppVer()
     {
@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     programInfo programInfo;
     for (;;)
     {
-        switch (getopt(argc, argv, "iu:shevlI")) // note the colon (:) to indicate that 'n' has a parameter and is not a switch
+        switch (getopt(argc, argv, "iu:shevlIB")) // note the colon (:) to indicate that 'n' has a parameter and is not a switch
         {
         case 'i':
             checkroot(); 
@@ -86,8 +86,13 @@ int main(int argc, char *argv[])
         case 'I':
             checkroot();
             fs::rename(argv[0], "apm");
-            fs::copy("apm", "/usr/bin");
+            fs::copy("apm", "/usr/bin", fs::copy_options::update_existing);
             fs::create_directories(paths.local_repo_directory);
+            std::cout<< "Succesfully installed/updated App Package Manager!" << std::endl; 
+            break;
+        case 'B':
+            system("g++ main.cpp -o main -larchive");
+            std::cout << "Build finished!" <<std::endl;
             break;
         case '?':
         case 'h':
