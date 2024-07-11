@@ -49,7 +49,7 @@ std::string replacePathPrefix(const std::string& originalPath, const std::string
 void indexFiles(const std::string& indexFile, const std::string& sourceDir, const std::string& replacementDir) {
     std::ofstream outFile(indexFile, std::ios::app); // Otwieramy plik do zapisu z dopisaniem (append)
     if (!outFile.is_open()) {
-        std::cerr << "Nie można otworzyć pliku indeksu: " << indexFile << std::endl;
+        std::cerr << "Cannot open INDEXFILE" << indexFile << std::endl;
         return;
     }
 
@@ -62,16 +62,15 @@ void indexFiles(const std::string& indexFile, const std::string& sourceDir, cons
             }
         }
     } catch (const fs::filesystem_error& e) {
-        std::cerr << "Błąd systemu plików podczas indeksowania: " << e.what() << std::endl;
+        std::cerr << "Filesystem error while indexing" << e.what() << std::endl;
     }
 
     outFile.close();
-    std::cout << "Indeksowanie katalogu " << sourceDir << " zakończone pomyślnie." << std::endl;
 }
 void deleteIndexedFiles(const std::string& indexFile) {
     std::ifstream inFile(indexFile);
     if (!inFile.is_open()) {
-        std::cerr << "Nie można otworzyć pliku indeksu do odczytu: " << indexFile << std::endl;
+        std::cerr << "Cannot read FILEINDEX " << indexFile << std::endl;
         return;
     }
 
@@ -79,14 +78,14 @@ void deleteIndexedFiles(const std::string& indexFile) {
     while (std::getline(inFile, filePath)) {
         try {
             fs::remove(filePath);
-            std::cout << "Usunięto plik: " << filePath << std::endl;
+            std::cout << "Removed: " << filePath << std::endl;
         } catch (const fs::filesystem_error& e) {
-            std::cerr << "Błąd systemu plików podczas usuwania: " << e.what() << std::endl;
+            std::cerr << "Filesystem error while removing: " << e.what() << std::endl;
         }
     }
 
     inFile.close();
-    std::cout << "Usuwanie plików zakończone pomyślnie." << std::endl;
+    std::cout << "Removed all indexed files." << std::endl;
 }
 void install() {
     jvars.j = json::parse(f);
