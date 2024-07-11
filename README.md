@@ -1,8 +1,10 @@
-# Compiling
+# APM - Package Manager without limitations
+
+## Compiling
  -  install clang (g++), libarchive-devel and nlohmann json (json-devel)
  -  compile with: `g++ main.cpp -o apm -larchive`
 
-# Usage
+## Usage
 
  - `sudo apm -i` install from APPCONF 
  - `sudo apm -u <package name>` uninstall package
