@@ -20,9 +20,4 @@ namespace pkg
         std::string const applicationdesktop = "/usr/share/applications";
         std::string const prefix = "[APM] ";
     };
-    class mgr
-    {
-        void install();
-        void uninstall();
-    };
 }

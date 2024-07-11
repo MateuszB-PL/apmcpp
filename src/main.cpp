@@ -26,7 +26,7 @@ file::paths paths;
 class programInfo
 {
 public:
-    std::string version = "alpha0.2";
+    std::string version = "prebeta0.3";
     std::string cppver;
     std::string chkCppVer()
     {
@@ -94,6 +94,7 @@ int main(int argc, char *argv[])
             system("g++ main.cpp -o main -larchive");
             std::cout << "Build finished!" <<std::endl;
             break;
+        case -1:
         case '?':
         case 'h':
         default:
@@ -106,8 +107,6 @@ int main(int argc, char *argv[])
  )";
             break;
 
-        case -1:
-            break;
         }
 
         break;
