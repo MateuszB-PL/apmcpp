@@ -1,8 +1,8 @@
 # APM - Package Manager without limitations
 
 ## Compiling
- -  install clang (g++), libarchive-devel and nlohmann json (json-devel)
- -  compile with: `g++ main.cpp -o apm -larchive`
+ -  install clang (g++), libarchive-devel, nlohmann json (json-devel), libcurl-devel
+ -  compile with: `g++ main.cpp -o apm -larchive -lcurl`
 
 ## Usage
 
