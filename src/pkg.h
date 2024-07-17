@@ -1,5 +1,4 @@
 // pkg.h
-std::ifstream f("APPCONF");
 
 namespace pkg
 {

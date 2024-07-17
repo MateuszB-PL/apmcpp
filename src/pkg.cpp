@@ -1,19 +1,13 @@
 // pkg.cpp
 
 // pkg
-void create_recursive_symlink(const fs::path &target, const fs::path &link)
-{
-    if (fs::is_directory(target))
-    {
-        fs::create_directory_symlink(target, link);
-        for (const auto &entry : fs::directory_iterator(target))
-        {
-            create_recursive_symlink(entry.path(), link / entry.path().filename());
+void create_recursive_symlink(const fs::path& target, const fs::path& link) {
+    try {
+        if (!fs::exists(link)) {
+            fs::create_symlink(target, link);
         }
-    }
-    else if (fs::is_regular_file(target))
-    {
-        fs::create_symlink(target, link);
+    } catch (const fs::filesystem_error& e) {
+        std::cerr << "Error creating symlink: " << e.what() << std::endl;
     }
 }
 
@@ -105,20 +99,29 @@ void deleteIndexedFiles(const std::string &indexFile)
 }
 void install()
 {
+    std::ifstream f("APPCONF");
     jvars.j = json::parse(f);
     jvars.appname = jvars.j["appname"];
-    jvars.pminstallcmd = jvars.j["pminstallcmd"];
+    try {
+        jvars.pminstallcmd = jvars.j["pminstallcmd"];
+        jvars.pmupdatecmd = jvars.j["pmupdatecmd"];
+    } catch(std::exception e) {
+        std::cout << "Ignoring Package Manager" << std::endl;
+    }
     jvars.pkgarchivetype = jvars.j["pkgarchivetype"];
-    jvars.pmupdatecmd = jvars.j["pmupdatecmd"];
     jvars.appsrc = jvars.j["appsrc"];
 
     std::cout << "Apps that will be installed: " << jvars.appname << std::endl
               << std::endl;
     std::cout << "Dependencies that will be installed: ";
-    for (std::string value : jvars.j["deps"])
-    {
-        std::string cmd = std::string(value) + " ";
-        std::cout << cmd.c_str();
+    try {
+        for (std::string value : jvars.j["deps"])
+        {
+            std::string cmd = std::string(value) + " ";
+            std::cout << cmd.c_str();
+        }
+    } catch(std::exception e) {
+        std::cout << "DEPS EMPTY" << std::endl;
     }
     // std::cout<< "Commands that will be executed: ";
     // for (std::string value : j["cmds"]) {
@@ -144,7 +147,6 @@ void install()
         std::string extractstr = jvars.appname + "." + std::string(jvars.pkgarchivetype);
         extract(extractstr.c_str());
         const auto copyOptions = std::filesystem::copy_options::update_existing | std::filesystem::copy_options::recursive;
-
         std::filesystem::copy(jvars.appname, "/usr/apps/" + jvars.appname, copyOptions);
         std::filesystem::remove_all(jvars.appname);
         std::cout << vars.prefix << "Extracting and Copying done" << std::endl;

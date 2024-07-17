@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <nlohmann/json.hpp>
 #include <curl/curl.h>
+#include <vector>
 
 using json = nlohmann::json;
 namespace fs = std::filesystem;
@@ -60,6 +61,7 @@ void checkroot()
 int main(int argc, char *argv[])
 {
     programInfo programInfo;
+    std::string working_directory = fs::current_path();
     for (;;)
     {
         switch (getopt(argc, argv, "iu:s:hevlIBr")) // note the colon (:) to indicate that 'n' has a parameter and is not a switch
@@ -75,7 +77,14 @@ int main(int argc, char *argv[])
             uninstall(optarg);
             break;
         case 's':
-            syncrepo("https://raw.githubusercontent.com/MateuszB-PL/apr/x64_86/x64_86/pkg/" + std::string(optarg) + ".tar.gz", optarg);
+            fs::create_directory("/tmp" + std::string(optarg));
+            fs::current_path("/tmp" + std::string(optarg));
+            syncrepo("https://raw.githubusercontent.com/MateuszB-PL/apr/x64_86/x64_86/pkg/" + std::string(optarg) + "/APPCONF", "APPCONF");
+            std::cout << "Succesfully synced APPCONF" << fs::current_path() << std::endl;
+            install();
+            std::cout << "Succesfully installed " << std::string(optarg) << std::endl;
+            fs::current_path(working_directory);
+            fs::remove_all("/tmp" + std::string(optarg));
             break;
         case 'r':
             syncrepo("https://raw.githubusercontent.com/MateuszB-PL/apr/x64_86/x64_86/ARCH", "GITRESPONSE.ARCH");
@@ -105,17 +114,16 @@ int main(int argc, char *argv[])
         case 'h':
         default:
             std::cout << R"(
-    sudo apm -i - install from APPCONF
-    sudo apm -u <package name> - uninstall package
-    apm -e - generate example appconf
-    apm -l - list all installed apps
-    apm -v - displays c++ compilation version and APM version
-    apm -B - self build from src
-    sudo apm -I - installation after building
-    sudo apm -s - sync package from repo
-    apm -r - check arch response from raw git repo
-
-)";
+                sudo apm -i - install from APPCONF
+                sudo apm -u <package name> - uninstall package
+                apm -e - generate example appconf
+                apm -l - list all installed apps
+                apm -v - displays c++ compilation version and APM version
+                apm -B - self build from src
+                sudo apm -I - installation after building
+                sudo apm -s - sync package from repo
+                apm -r - check arch response from raw git repo
+            )";
             break;
         }
 
