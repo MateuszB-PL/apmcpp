@@ -17,8 +17,8 @@ namespace fs = std::filesystem;
 #include "pkg.h"
 #include "sync.cpp"
 
-pkg::jvars jvars;
-pkg::vars vars;
+pkg::application_info application_info;
+pkg::constant_variables constant_variables;
 file::paths paths;
 
 #include "libarchive.cpp"
@@ -54,13 +54,13 @@ void checkroot()
 {
     if (getuid() != 0)
     {
-        std::cout << vars.prefix << "Please run as root";
+        std::cout << constant_variables.prefix << "Please run as root";
         exit(1);
     }
 }
 int main(int argc, char *argv[])
 {
-    programInfo programInfo;
+    programInfo program_information;
     std::string working_directory = fs::current_path();
     for (;;)
     {
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
         {
         case 'i':
             checkroot();
-            std::cout << vars.prefix << "Installing from APPCONF" << std::endl;
+            std::cout << constant_variables.prefix << "Installing from APPCONF" << std::endl;
             install();
             break;
 
@@ -86,28 +86,14 @@ int main(int argc, char *argv[])
             fs::current_path(working_directory);
             fs::remove_all("/tmp" + std::string(optarg));
             break;
-        case 'r':
-            syncrepo("https://raw.githubusercontent.com/MateuszB-PL/apr/x64_86/x64_86/ARCH", "GITRESPONSE.ARCH");
-            break;
         case 'e':
-            gen_example_appconf();
+            generate_example_appconf();
             break;
         case 'v':
-            std::cout << "C++ build version: " << __cplusplus << " or " << programInfo.chkCppVer() << "\n APM - App Package Manager version: " << programInfo.version << std::endl;
+            std::cout << "C++ build version: " << __cplusplus << " or " << program_information.chkCppVer() << "\n APM - App Package Manager version: " << program_information.version << std::endl;
             break;
         case 'l':
             display_installed_packages();
-            break;
-        case 'I':
-            checkroot();
-            fs::rename(argv[0], "apm");
-            fs::copy("apm", "/usr/bin", fs::copy_options::update_existing);
-            fs::create_directories(paths.local_repo_directory);
-            std::cout << "Succesfully installed/updated App Package Manager!" << std::endl;
-            break;
-        case 'B':
-            system("g++ main.cpp -o main -larchive");
-            std::cout << "Build finished!" << std::endl;
             break;
         case -1:
         case '?':
@@ -115,14 +101,11 @@ int main(int argc, char *argv[])
         default:
             std::cout << R"(
                 sudo apm -i - install from APPCONF
+                sudo apm -s - sync package from repo
                 sudo apm -u <package name> - uninstall package
                 apm -e - generate example appconf
                 apm -l - list all installed apps
                 apm -v - displays c++ compilation version and APM version
-                apm -B - self build from src
-                sudo apm -I - installation after building
-                sudo apm -s - sync package from repo
-                apm -r - check arch response from raw git repo
             )";
             break;
         }
