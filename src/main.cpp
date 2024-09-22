@@ -77,10 +77,10 @@ int main(int argc, char *argv[])
             uninstall(optarg);
             break;
         case 's':
-            fs::create_directory("/tmp" + std::string(optarg));
-            fs::current_path("/tmp" + std::string(optarg));
+            fs::create_directories("/tmp/apppackagemanager/" + std::string(optarg));
+            fs::current_path("/tmp/apppackagemanager/" + std::string(optarg));
             syncrepo("https://raw.githubusercontent.com/MateuszB-PL/apr/x64_86/x64_86/pkg/" + std::string(optarg) + "/APPCONF", "APPCONF");
-            std::cout << "Succesfully synced APPCONF" << fs::current_path() << std::endl;
+            std::cout << "Succesfully synced APPCONF" << std::endl;
             install();
             std::cout << "Succesfully installed " << std::string(optarg) << std::endl;
             fs::current_path(working_directory);

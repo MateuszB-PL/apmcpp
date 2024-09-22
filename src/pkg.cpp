@@ -168,6 +168,7 @@ void install()
     std::filesystem::copy(application_info.appname, constant_variables.app_repository_path + application_info.appname, copyOptions);
     std::filesystem::remove_all(application_info.appname);
     std::cout << constant_variables.prefix << "Extracting and Copying done" << std::endl;
+
     std::string FILEINDEX = constant_variables.app_repository_path + application_info.appname + "/FILEINDEX";
     std::string root_directory = constant_variables.app_repository_path + application_info.appname + "/root/";
     std::string desktop_file_directory = constant_variables.app_repository_path + application_info.appname + "/desktop/";

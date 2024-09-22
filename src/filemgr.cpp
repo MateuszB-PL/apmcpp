@@ -3,7 +3,7 @@ void generate_example_appconf()
     std::ofstream outfile("rename_to_APPCONF");
 
     outfile << R"({
-    "appname":"name of an app",
+    "appname":"example",
     "appversion": "1.0.0",
     "pkgarchivetype": "tar.gz",
     "pmupdatecmd": "dnf update -y",
