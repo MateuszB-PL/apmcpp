@@ -26,7 +26,7 @@ pkg::application_info application_info;
 
 class programInfo {
  public:
-  std::string version = "prebeta0.4";
+  std::string version = "prebeta0.5";
   std::string cppver;
   std::string chkCppVer() {
     if (__cplusplus == 202101L)
