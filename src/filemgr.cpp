@@ -1,32 +1,23 @@
-void generate_example_appconf()
-{
-    std::ofstream outfile("rename_to_APPCONF");
+void generate_example_appconf() {
+  std::ofstream outfile("rename_to_APPCONF");
 
-    outfile << R"({
+  outfile << R"({
     "appname":"example",
     "appversion": "1.0.0",
     "pkgarchivetype": "tar.gz",
-    "pmupdatecmd": "dnf update -y",
-    "pminstallcmd": "dnf install -y",
-    "deps": [
-        "nano",
-        "mc"
-    ],
     "prep": [
-        "echo Commands that will be executed before installation"
+        "echo <Commands that will be executed before installation>"
     ],
     "post": [
-        "echo Commands that will be executed after installation"
+        "echo <Commands that will be executed after installation>"
     ],
-    "APPCONFVERSION": 1
+    "APPCONFVERSION": 2
 }
 )" << std::endl;
 
-    outfile.close();
+  outfile.close();
 }
 
-void display_installed_packages()
-{
-    for (const auto &entry : fs::directory_iterator(paths.local_repo_directory))
-        std::cout << entry.path() << std::endl;
+void display_installed_packages() {
+  for (const auto &entry : fs::directory_iterator(pkg::constant_variables::app_repository_path)) std::cout << entry.path() << std::endl;
 }
