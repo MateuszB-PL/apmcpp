@@ -8,7 +8,7 @@ SRC_DIR := src
 BUILD_DIR := build
 
 SRC := src/main.cpp
-TARGET := main
+TARGET := apm
 LIBS := -larchive -lcurl
 
 all: $(TARGET)

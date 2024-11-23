@@ -4,12 +4,11 @@
 
 - install clang (g++), libarchive-devel, nlohmann json (json-devel), libcurl-devel
 - compile with: `make`
-- done
 
 ## Installing
+
 - Compile
-- run `sudo ./main -s apm`
-- done
+- run `sudo ./apm -s apm`
 
 ## Usage
 

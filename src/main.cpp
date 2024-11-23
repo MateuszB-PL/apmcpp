@@ -80,6 +80,7 @@ int main(int argc, char *argv[]) {
         uninstall(optarg);
         break;
       case 's':
+        checkroot();
         fs::create_directories("/tmp/apppackagemanager/" + std::string(optarg));
         fs::current_path("/tmp/apppackagemanager/" + std::string(optarg));
         syncrepo("https://raw.githubusercontent.com/MateuszB-PL/apr/" + getProcessorArchitecture() + "/" + getProcessorArchitecture() + "/pkg/" + std::string(optarg) + "/APPCONF", "APPCONF");
@@ -104,13 +105,16 @@ int main(int argc, char *argv[]) {
       case 'h':
       default:
         std::cout << R"(
-                sudo apm -i - install from APPCONF
-                sudo apm -s - sync and install package from repo
-                sudo apm -u <package name> - uninstall package
-                apm -e - generate example appconf
-                apm -l - list all installed apps
-                apm -v - displays c++ compilation version and APM version
-            )";
+APM HELP:
+
+sudo apm -i - install from APPCONF
+sudo apm -s - sync and install package from repo
+sudo apm -u <package name> - uninstall package
+apm -e - generate example appconf
+apm -l - list all installed apps
+apm -v - displays c++ compilation version and APM version
+
+)";
         break;
     }
 
