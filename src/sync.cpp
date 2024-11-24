@@ -24,12 +24,10 @@ void syncrepo(const std::string &url, const std::string &filename) {
     res = curl_easy_perform(curl);
 
     if (res != CURLE_OK) {
-      std::cerr << "Sync failed: " << curl_easy_strerror(res) << ". Package or repository not found."
-                << std::endl;
+      std::cerr << "Sync failed: " << curl_easy_strerror(res) << ". Package or repository not found." << std::endl;
       exit(404);
     } else {
-      std::cout << "Successfully synced: " << url << " to " << filename
-                << std::endl;
+      std::cout << "Successfully synced: " << url << " to " << filename << std::endl;
     }
 
     curl_easy_cleanup(curl);

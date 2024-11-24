@@ -10,15 +10,18 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include <vector>
-
 using json = nlohmann::json;
 namespace fs = std::filesystem;
 
-#include "pkg.h"
+#include "appconfmanager.hpp"
+#include "pkg.hpp"
 #include "sync.cpp"
+pkg::management management;
+pkg::indexer pkgIndexer;
+acm::management mgr;
+acm::data appconf;
 
-pkg::application_info application_info;
-
+#include "appconfmanager.cpp"
 #include "filemgr.cpp"
 #include "libarchive.cpp"
 #include "pkg.cpp"
@@ -50,7 +53,7 @@ std::string getProcessorArchitecture() {
 #if defined(__aarch64__) || defined(_M_ARM64)
   return "arm64";
 #elif defined(__x86_64__) || defined(_M_X64)
-  return "x64_86";
+  return "x64";
 #elif defined(__i386__) || defined(_M_IX86)
   return "x86";
 #else
@@ -72,20 +75,20 @@ int main(int argc, char *argv[]) {
       case 'i':
         checkroot();
         std::cout << pkg::constant_variables::prefix << "Installing from APPCONF" << std::endl;
-        install();
+        management.install();
         break;
 
       case 'u':
         checkroot();
-        uninstall(optarg);
+        management.uninstall(optarg);
         break;
       case 's':
         checkroot();
         fs::create_directories("/tmp/apppackagemanager/" + std::string(optarg));
         fs::current_path("/tmp/apppackagemanager/" + std::string(optarg));
-        syncrepo("https://raw.githubusercontent.com/MateuszB-PL/apr/" + getProcessorArchitecture() + "/" + getProcessorArchitecture() + "/pkg/" + std::string(optarg) + "/APPCONF", "APPCONF");
+        syncrepo("http://apr.loop64.com/" + getProcessorArchitecture() + "/pkg/" + std::string(optarg) + "/APPCONF", "APPCONF");
         std::cout << "Succesfully synced APPCONF" << std::endl;
-        install();
+        management.install();
         std::cout << "Succesfully installed " << std::string(optarg) << std::endl;
         fs::current_path(working_directory);
         fs::remove_all("/tmp/apppackagemanager");
@@ -106,7 +109,6 @@ int main(int argc, char *argv[]) {
       default:
         std::cout << R"(
 APM HELP:
-
 sudo apm -i - install from APPCONF
 sudo apm -s - sync and install package from repo
 sudo apm -u <package name> - uninstall package

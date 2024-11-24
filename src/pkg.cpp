@@ -1,19 +1,14 @@
-#include "pkg.h"
 // pkg.cpp
 
 // pkg
-void create_recursive_symlink(const fs::path &target, const fs::path &link) {
-  try {
-    if (!fs::exists(link)) {
-      fs::create_symlink(target, link);
-    }
-  } catch (const fs::filesystem_error &e) {
-    std::cerr << "Error creating symlink: " << e.what() << std::endl;
-  }
-}
+#include "pkg.hpp"
+
+#include <bits/this_thread_sleep.h>
+
+#include <tabulate/table.hpp>
 
 void forExecuteCommands(const std::string &jsonarray) {
-  for (std::string value : application_info.j[jsonarray]) {
+  for (std::string value : mgr.APPCONFvalue(jsonarray)) {
     system(value.c_str());
   }
 }
@@ -28,7 +23,7 @@ std::string replacePathPrefix(const std::string &originalPath, const std::string
   }
 }
 
-void indexFiles(const std::string &indexFile, const std::string &sourceDir, const std::string &replacementDir) {
+void pkg::indexer::indexFiles(const std::string &indexFile, const std::string &sourceDir, const std::string &replacementDir) {
   std::ofstream outFile(indexFile, std::ios::app);
   if (!outFile.is_open()) {
     std::cerr << "Cannot open INDEXFILE" << indexFile << std::endl;
@@ -54,7 +49,7 @@ void indexFiles(const std::string &indexFile, const std::string &sourceDir, cons
   outFile.close();
 }
 
-void deleteIndexedFiles(const std::string &indexFile) {
+void pkg::indexer::deleteIndexedFiles(const std::string &indexFile) {
   std::ifstream inFile(indexFile);
   if (!inFile.is_open()) {
     std::cerr << "Cannot read FILEINDEX " << indexFile << std::endl;
@@ -74,10 +69,20 @@ void deleteIndexedFiles(const std::string &indexFile) {
   inFile.close();
   std::cout << "Removed all indexed files." << std::endl;
 }
+// Link all files
+void create_recursive_symlink(const fs::path &target, const fs::path &link) {
+  try {
+    if (!fs::exists(link)) {
+      fs::create_symlink(target, link);
+    }
+  } catch (const fs::filesystem_error &e) {
+    std::cerr << "Error creating symlink: " << e.what() << std::endl;
+  }
+}
 void linkFiles() {
   try {
-    std::string root = pkg::constant_variables::app_repository_path + application_info.appname + "/root/";
-    std::string desktop = pkg::constant_variables::app_repository_path + application_info.appname + "/desktop/";
+    std::string root = pkg::constant_variables::app_repository_path + appconf.appname + "/root/";
+    std::string desktop = pkg::constant_variables::app_repository_path + appconf.appname + "/desktop/";
     if (fs::exists(root) && fs::is_directory(root)) {
       for (const auto &entry : fs::recursive_directory_iterator(root)) {
         fs::path target = entry.path();
@@ -97,82 +102,106 @@ void linkFiles() {
     exit(1);
   }
 }
-void loadAPPCONF() {
-  std::ifstream f("APPCONF");
-  try {
-    application_info.j = json::parse(f);
-  } catch (nlohmann::json::parse_error &e) {
-    std::cerr << "This file contains syntax errors!" << std::endl;
-    exit(1);
-  }
-  try {
-    application_info.appname = application_info.j["appname"];
-    application_info.pkgarchivetype = application_info.j["pkgarchivetype"];
-    application_info.appversion = application_info.j["appversion"];
-  } catch (nlohmann::json::type_error &e) {
-    std::cerr << "This APPCONF is not configured properly!" << std::endl;
-    exit(1);
-  }
-  int APPCONFVERSION = application_info.j["APPCONFVERSION"];
-  if (APPCONFVERSION != 2) {
-    std::cout << "This APM only supports version 2 of APPCONF. Current version: " << std::to_string(APPCONFVERSION) << ". Please update APPCONF or APM!" << std::endl;
-    exit(3);
-  }
-}
 
+//
+// exit
 void exitUserInterrupt() {
   std::cout << "Bye!" << std::endl;
   exit(0);
 }
+//
+// progress bar
+void showProgressBar(float progress, int barWidth = 30) {
+  int pos = static_cast<int>(barWidth * progress);
+  std::cout << "[";
+  for (int i = 0; i < barWidth; ++i) {
+    if (i < pos) {
+      std::cout << "=";
+    } else if (i == pos) {
+      std::cout << ">";
+    } else {
+      std::cout << " ";
+    }
+  }
+  std::cout << "] " << int(progress * 100.0) << " %\r";
+  std::cout.flush();
+}
+void progress(float percent) {
+  for (int i = 0; i <= 100; ++i) {
+    float currentProgress = (i / 100.0f) * percent;
+    showProgressBar(currentProgress);
+  }
+  std::cout << std::endl;
+  std::cout << std::endl;
+}
+//
+void pkg::management::install() {
+  mgr.APPCONFinit();
+  appconf.appname = mgr.APPCONFvalue("appname");
+  appconf.appversion = mgr.APPCONFvalue("appversion");
+  appconf.pkgarchivetype = mgr.APPCONFvalue("pkgarchivetype");
+  appconf.description = mgr.APPCONFvalue("description");
+  tabulate::Table package_info;
+  package_info.add_row({"Name", "Version", "Description"});
+  package_info.add_row({appconf.appname, appconf.appversion, appconf.description});
+  std::cout << package_info << std::endl;
 
-void install() {
-  loadAPPCONF();
-
-  std::cout << std::endl << std::endl;
   std::cout << "Continue? [Y/n]: ";
 
   char userinput = std::cin.get();
   if (tolower(userinput) == 'n') {
     exitUserInterrupt();
   }
+  progress(0);
 
   std::cout << pkg::constant_variables::prefix << "Executing preparation commands... " << std::endl;
 
   forExecuteCommands("prep");
-
+  progress(0.14);
   std::cout << pkg::constant_variables::prefix << "Please wait, extraction in progress, this might take a while..." << std::endl;
-  std::string extractstr = application_info.appname + "." + std::string(application_info.pkgarchivetype);
+  std::string extractstr = appconf.appname + "." + std::string(appconf.pkgarchivetype);
 
   extract(extractstr.c_str());
+  progress(0.28);
 
   const auto copyOptions = std::filesystem::copy_options::update_existing | std::filesystem::copy_options::recursive;
-  std::filesystem::copy(application_info.appname, pkg::constant_variables::app_repository_path + application_info.appname, copyOptions);
-  std::filesystem::remove_all(application_info.appname);
+  std::filesystem::copy(appconf.appname, pkg::constant_variables::app_repository_path + appconf.appname, copyOptions);
+  std::filesystem::remove_all(appconf.appname);
 
   std::cout << pkg::constant_variables::prefix << "Extracting and Copying done" << std::endl;
+  progress(0.42);
 
-  std::string FILEINDEX = pkg::constant_variables::app_repository_path + application_info.appname + "/FILEINDEX";
-  std::string root_directory = pkg::constant_variables::app_repository_path + application_info.appname + "/root/";
-  std::string desktop_file_directory = pkg::constant_variables::app_repository_path + application_info.appname + "/desktop/";
+  std::string FILEINDEX = pkg::constant_variables::app_repository_path + appconf.appname + "/FILEINDEX";
+  std::string root_directory = pkg::constant_variables::app_repository_path + appconf.appname + "/root/";
+  std::string desktop_file_directory = pkg::constant_variables::app_repository_path + appconf.appname + "/desktop/";
 
-  indexFiles(FILEINDEX, root_directory, "/");
-  indexFiles(FILEINDEX, desktop_file_directory, pkg::constant_variables::system_applications_directory);
+  pkgIndexer.indexFiles(FILEINDEX, root_directory, "/");
+  pkgIndexer.indexFiles(FILEINDEX, desktop_file_directory, pkg::constant_variables::system_applications_directory);
   std::cout << pkg::constant_variables::prefix << "Successfully indexed files" << std::endl;
+  progress(0.71);
 
   linkFiles();
   std::cout << pkg::constant_variables::prefix << "Successfully linked files" << std::endl;
+  progress(0.85);
 
   std::cout << pkg::constant_variables::prefix << "Executing post-install commands..." << std::endl;
   forExecuteCommands("post");
+  progress(1);
 
   std::cout << pkg::constant_variables::prefix << "Installation Complete!" << std::endl;
 }
 
-void uninstall(std::string appname) {
+void pkg::management::uninstall(std::string appname) {
   std::string apppath = pkg::constant_variables::app_repository_path + appname;
   if (fs::exists(apppath) && fs::is_directory(apppath)) {
-    deleteIndexedFiles(apppath + "/FILEINDEX");
+    progress(0);
+    pkgIndexer.deleteIndexedFiles(apppath + "/FILEINDEX");
+
+    progress(0.5);
     fs::remove_all(apppath);
+
+    progress(1);
+
     std::cout << pkg::constant_variables::prefix << "App removed from local APM repo: " << appname << std::endl;
   } else {
     std::cout << pkg::constant_variables::prefix << "App package couldn't be found in local APM repo: " << appname << std::endl;
