@@ -2,7 +2,7 @@
 
 ## Compiling
 
-- install clang (g++), libarchive-devel, nlohmann json (json-devel), libcurl-devel
+- install clang (g++), libarchive-devel, nlohmann json (json-devel), libcurl-devel, tabulate: https://github.com/p-ranav/tabulate
 - compile with: `make`
 
 ## Installing
